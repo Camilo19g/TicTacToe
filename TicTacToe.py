@@ -1,23 +1,60 @@
 import tkinter as tk
 import math
 
+
 class TicTacToe:
     def __init__(self, master):
         self.master = master
         self.master.title("Tic Tac Toe")
-        self.player = "X"
-        self.computer = "O"
+
+        self.player_choice = None
+
+        self.player1_button = tk.Button(
+            self.master, text="Player X", command=lambda: self.choose_player("X"), width=8)
+        self.player1_button.grid(row=4, column=0, padx=0, pady=0)
+
+        self.player2_button = tk.Button(
+            self.master, text="Player O", command=lambda: self.choose_player("O"), width=8)
+        self.player2_button.grid(row=4, column=2, padx=0, pady=0)
+
         self.board = [[" " for _ in range(3)] for _ in range(3)]
         self.buttons = []
         for i in range(3):
             row = []
             for j in range(3):
-                button = tk.Button(master, text="", width=8, height=4, command=lambda i=i, j=j: self.play(i, j))
-                button.grid(row=i, column=j)
+                button = tk.Button(
+                    self.master, text="", width=10, height=4, command=lambda i=i, j=j: self.play(i, j))
+                button.grid(row=i, column=j, padx=0, pady=0)
+                button.configure(state="disabled")
                 row.append(button)
             self.buttons.append(row)
-        self.status = tk.Label(master, text="Turn: " + self.player, font=("Helvetica", 16))
+
+        self.status = tk.Label(
+            self.master, text="Please choose a player", font=("Helvetica", 16))
         self.status.grid(row=3, columnspan=3)
+
+    def choose_player(self, player):
+        self.player_choice = player
+        if self.player_choice == 'X':
+            self.player = "X"
+            self.computer = "O"
+            self.computer_turn = False
+        else:
+            self.player = "O"
+            self.computer = "X"
+            self.computer_turn = True
+
+        self.player1_button.config(state='disabled')
+        self.player2_button.config(state='disabled')
+
+        self.status.config(text="Turn: " + self.player)
+
+        for row in self.buttons:
+            for button in row:
+                button.configure(state="normal")
+
+        if self.computer_turn:
+            self.computer_play()
 
     def play(self, i, j):
         if self.board[i][j] == " ":
@@ -87,7 +124,7 @@ class TicTacToe:
                         self.board[i][j] = " "
                         best_score = min(score, best_score)
             return best_score
-        
+
     def check_win(self):
         for i in range(3):
             if self.board[i][0] == self.board[i][1] == self.board[i][2] != " ":
@@ -102,26 +139,13 @@ class TicTacToe:
             return "Tie"
         return None
 
-    def get_best_move(self):
-        best_score = -math.inf
-        best_move = None
-        for i in range(3):
-            for j in range(3):
-                if self.board[i][j] == " ":
-                    self.board[i][j] = self.computer
-                    score = self.min_max(0, False)
-                    self.board[i][j] = " "
-                    if score > best_score:
-                        best_score = score
-                        best_move = (i, j)
-        return best_move
- 
     def disable_buttons(self):
         for i in range(3):
             for j in range(3):
                 self.buttons[i][j].config(state="disabled")
 
+
 if __name__ == "__main__":
     root = tk.Tk()
     tictactoe = TicTacToe(root)
-    root.mainloop()  
+    root.mainloop()
